@@ -1,0 +1,17 @@
+name: Linting
+
+on:
+  pull_request:
+
+jobs:
+  ruff:
+    name: Ruff Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Run Ruff
+        run: uv run ruff check .
