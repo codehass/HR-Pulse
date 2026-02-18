@@ -1,16 +1,35 @@
-import os
+import logging
+from contextlib import asynccontextmanager
 
-from dotenv import load_dotenv
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .api.routers import auth
+from .config import settings
 from .db.database import Base, engine
 
-load_dotenv()
-FRONTEND_URL = os.getenv("FRONTEND_URL")
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-app = FastAPI()
 
-origins = [FRONTEND_URL]
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Creating database tables...")
+    Base.metadata.create_all(bind=engine)
+
+    yield
+    print("Shutting down...")
+
+
+app = FastAPI(
+    title="HR puls",
+    lifespan=lifespan,
+    description=(
+        "This API provides endpoints for users to authenticate and ask questions about IT support"
+    ),
+)
+
+origins = [settings.FRONTEND_URL]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -19,9 +38,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-Base.metadata.create_all(bind=engine)
+app.include_router(auth.router)
 
 
-@app.get("/")
+@app.get("/", tags=["Home route"])
 def get_home():
-    return {"message": "Hello to our sentiment api!!"}
+    return {"message": "Hello to It Support RAG API"}
