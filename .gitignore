@@ -17,3 +17,5 @@ mlartifacts
 .mypy_cache/
 .ruff_cache/
 test.db
+terraform/terraform.tfstate
+terraform/terraform.tfvars
