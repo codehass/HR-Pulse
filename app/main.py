@@ -25,7 +25,7 @@ app = FastAPI(
     title="HR puls",
     lifespan=lifespan,
     description=(
-        "This API provides endpoints for users to authenticate and ask questions about IT support"
+        "This API provides endpoints for users to authenticate and ask HR puls!"
     ),
 )
 
@@ -43,4 +43,4 @@ app.include_router(auth.router)
 
 @app.get("/", tags=["Home route"])
 def get_home():
-    return {"message": "Hello to It Support RAG API"}
+    return {"message": "Hello to HR PULS API"}
