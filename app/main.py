@@ -1,9 +1,9 @@
 import os
-from .models.user_model import User
-from .db.database import engine, Base, get_db
+
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 
+from .db.database import Base, engine
 
 load_dotenv()
 FRONTEND_URL = os.getenv("FRONTEND_URL")

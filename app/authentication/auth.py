@@ -1,15 +1,17 @@
-import os, jwt
+import os
+from datetime import UTC, datetime, timedelta
+
+import jwt
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
+from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
+
+from ..db import database
 from ..models.user_model import User
 from ..schemas.user_schema import TokenData
-from ..db import database
-from sqlalchemy.orm import Session
-from datetime import timedelta, datetime, timezone
-from typing import Optional
-from jwt.exceptions import InvalidTokenError
 
 load_dotenv()
 
@@ -37,12 +39,12 @@ def authenticate_user(db: Session, username: str, password: str):
     return user
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=20)
+        expire = datetime.now(UTC) + timedelta(minutes=20)
 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
