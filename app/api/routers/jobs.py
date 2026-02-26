@@ -74,7 +74,7 @@ def predict_and_save_salary(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"ML Model Prediction Error: {str(e)}",
-        )
+        ) from e
 
     new_job = Job(
         **payload.model_dump(), predicted_salary=salary, owner_id=current_user.id
