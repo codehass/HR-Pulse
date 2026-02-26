@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api.routers import auth
+from .api.routers import auth, jobs
 from .config import settings
 from .db.database import Base, engine
 
@@ -39,6 +39,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(jobs.router)
 
 
 @app.get("/", tags=["Home route"])
