@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     HF_TOKEN: str = Field(...)
     MLFLOW_TRACKING_URI: str = Field(...)
     DATABASE_URL: str = Field(...)
+    ENDPOINT: str = Field(...)
+    KEY: str = Field(...)
 
     model_config = ConfigDict(env_file=".env", env_file_encoding="utf-8")
 
