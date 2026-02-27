@@ -1,0 +1,76 @@
+services:
+  frontend_app:
+    container_name: frontend_app
+    build:
+      context: ../HR-Pulse-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    env_file:
+      - ./.env
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:${BACKEND_PORT:-8000}
+      - BACKEND_URL=http://backend_app:8000
+    depends_on:
+      backend_app:
+        condition: service_started
+    networks:
+      - fullstack-network
+    restart: always
+
+  backend_app:
+    container_name: backend_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    env_file:
+      - ./.env
+    environment:
+      FRONTEND_URL: http://frontend_app:${FRONTEND_INTERNAL_PORT:-3000}
+      DATABASE_HOST: database
+      DATABASE_PORT: 3306
+      DATABASE_USER: ${DATABASE_USER:-root}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-123456}
+      DATABASE_NAME: ${DATABASE_NAME:-hr_puls}
+      DATABASE_URL: mysql+pymysql://${DATABASE_USER:-root}:${DATABASE_PASSWORD:-123456}@database:3306/${DATABASE_NAME:-hr_puls}
+      SECRET_KEY: ${SECRET_KEY}
+      ALGORITHM: ${ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      HF_TOKEN: ${HF_TOKEN}
+      MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI}
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - fullstack-network
+    restart: always
+
+  database:
+    container_name: database
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD:-123456}
+      MYSQL_DATABASE: ${DATABASE_NAME:-hr_puls}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fullstack-network
+    restart: always
+
+networks:
+  fullstack-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
