@@ -7,13 +7,10 @@ services:
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     env_file:
-      - ./.env
+      - .env
     environment:
       - NEXT_PUBLIC_BACKEND_URL=http://localhost:${BACKEND_PORT:-8000}
       - BACKEND_URL=http://backend_app:8000
-    depends_on:
-      backend_app:
-        condition: service_started
     networks:
       - fullstack-network
     restart: always
@@ -26,29 +23,17 @@ services:
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     env_file:
-      - ./.env
+      - .env
     environment:
       FRONTEND_URL: http://frontend_app:${FRONTEND_INTERNAL_PORT:-3000}
-      DATABASE_HOST: database
-      DATABASE_PORT: 3306
-      DATABASE_USER: ${DATABASE_USER:-root}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-123456}
-      DATABASE_NAME: ${DATABASE_NAME:-hr_puls}
-      DATABASE_URL: mysql+pymysql://${DATABASE_USER:-root}:${DATABASE_PASSWORD:-123456}@database:3306/${DATABASE_NAME:-hr_puls}
+      DATABASE_URL: ${DATABASE_URL}
       SECRET_KEY: ${SECRET_KEY}
-      ALGORITHM: ${ALGORITHM:-HS256}
-      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
-      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
-      HF_TOKEN: ${HF_TOKEN}
-      MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI}
-    depends_on:
-      database:
-        condition: service_healthy
     networks:
       - fullstack-network
     restart: always
 
   database:
+    profiles: ["local-db"]
     container_name: database
     image: mysql:8
     environment:
@@ -59,7 +44,16 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p$$MYSQL_ROOT_PASSWORD"]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-uroot",
+          "-p${DATABASE_PASSWORD:-123456}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
