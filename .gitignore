@@ -38,4 +38,3 @@ testNER.py
 **/terraform/.terraform.lock.hcl
 terraform/main.tf
 terraform/
-ml/models

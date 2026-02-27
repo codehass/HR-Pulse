@@ -18,7 +18,7 @@ jobs:
         run: uv python install 3.12
 
       - name: Run Ruff Linter
-        run: uvx ruff check .
+        run: uvx ruff check --fix .
 
       - name: Run Ruff Formatter
         run: uvx ruff format --check .
