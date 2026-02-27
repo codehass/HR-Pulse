@@ -1,31 +1,25 @@
-name: CI Pipeline
+name: Tests
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+on: [push, pull_request]
 
 jobs:
-  quality-gate:
+  pytest:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install uv (Manual method for act/local compatibility)
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: Set up Python
         run: uv python install 3.11
 
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --all-extras --dev
 
-      - name: Run Ruff Linting
-        run: uv run ruff check .
-
-      - name: Run Pytest
-        run: uv run pytest tests/
+      - name: Run tests
+        run: uv run pytest

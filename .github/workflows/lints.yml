@@ -8,13 +8,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Install uv manually
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
 
       - name: Set up Python
         run: uv python install 3.11
 
-      - name: Run Ruff
+      - name: Run Ruff Linter
         run: uvx ruff check .
+
+      - name: Run Ruff Formatter
+        # The --check flag ensures the CI fails if files are not formatted properly
+        run: uvx ruff format --check .
