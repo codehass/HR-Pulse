@@ -58,8 +58,8 @@ async def login_for_access_token(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=True,
-        samesite="Strict",
+        secure=False,
+        samesite="Lax",
         max_age=timedelta(hours=1),
     )
     return {"msg": "Login successful!"}
@@ -70,8 +70,8 @@ async def logout_user(response: Response):
     response.delete_cookie(
         key="access_token",
         httponly=True,
-        secure=True,
-        samesite="Strict",
+        secure=False,
+        samesite="Lax",
         path="/",
     )
     return {"msg": "Logged out successfully!"}
