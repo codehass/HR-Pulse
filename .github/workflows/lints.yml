@@ -15,11 +15,10 @@ jobs:
           enable-cache: true
 
       - name: Set up Python
-        run: uv python install 3.11
+        run: uv python install 3.12
 
       - name: Run Ruff Linter
         run: uvx ruff check .
 
       - name: Run Ruff Formatter
-        # The --check flag ensures the CI fails if files are not formatted properly
         run: uvx ruff format --check .

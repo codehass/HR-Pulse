@@ -16,10 +16,26 @@ jobs:
           cache-dependency-glob: "uv.lock"
 
       - name: Set up Python
-        run: uv python install 3.11
+        run: uv python install 3.12
 
       - name: Install dependencies
         run: uv sync --all-extras --dev
 
       - name: Run tests
+        env:
+          DATABASE_HOST: localhost
+          DATABASE_PASSWORD: test
+          DATABASE_NAME: test
+          DATABASE_USER: test
+          DATABASE_PORT: 5432
+          SECRET_KEY: test_secret_key
+          ALGORITHM: HS256
+          ACCESS_TOKEN_EXPIRE_MINUTES: 30
+          FRONTEND_URL: http://localhost:3000
+          GOOGLE_API_KEY: test_key
+          HF_TOKEN: test_token
+          MLFLOW_TRACKING_URI: http://localhost:5000
+          DATABASE_URL: sqlite:///./test.db
+          ENDPOINT: http://localhost:8000
+          KEY: test_key
         run: uv run pytest
