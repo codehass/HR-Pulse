@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, Column, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -19,3 +19,10 @@ class Job(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     owner_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("User", back_populates="jobs")
+
+
+class JobSkills(Base):
+    __tablename__ = "job_skills"
+    id = Column(Integer, primary_key=True, index=True)
+    job_title = Column(String(100), nullable=True)
+    skills_extracted = Column(JSON)

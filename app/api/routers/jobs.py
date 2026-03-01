@@ -3,9 +3,13 @@ from sqlalchemy.orm import Session
 
 from app.authentication.auth import get_current_user
 from app.db.database import get_db
-from app.models.job_model import Job
+from app.models.job_model import Job, JobSkills
 from app.models.user_model import User
-from app.schemas.job_schema import SalaryPredictionRequest
+from app.schemas.job_schema import (
+    JobSkillsCreate,
+    JobSkillsResponse,
+    SalaryPredictionRequest,
+)
 from ml.models.salary_prediction import SalaryPredictor
 
 router = APIRouter(prefix="/api/v1/jobs", tags=["Jobs routes"])
@@ -91,3 +95,26 @@ def predict_and_save_salary(
         "currency": "USD",
         "owner": current_user.username,
     }
+
+
+@router.post("/skills/", response_model=JobSkillsResponse)
+def create_job_skill(skill_data: JobSkillsCreate, db: Session = Depends(get_db)):
+    db_item = db.query(JobSkills).filter(JobSkills.id == skill_data.id).first()
+    if db_item:
+        raise HTTPException(status_code=400, detail="ID already exists")
+
+    new_job = JobSkills(
+        id=skill_data.id,
+        job_title=skill_data.job_title,
+        skills_extracted=skill_data.skills_extracted,
+    )
+
+    db.add(new_job)
+    db.commit()
+    db.refresh(new_job)
+    return new_job
+
+
+@router.get("/skills/", response_model=list[JobSkillsResponse])
+def get_all_skills(db: Session = Depends(get_db)):
+    return db.query(JobSkills).all()

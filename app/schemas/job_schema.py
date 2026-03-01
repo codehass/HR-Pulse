@@ -10,3 +10,14 @@ class SalaryPredictionRequest(BaseModel):
     job_description_text: str = Field(
         ..., json_schema_extra={"example": "Looking for..."}
     )
+
+
+class JobSkillsCreate(BaseModel):
+    id: int
+    job_title: str | None = "Unknown"
+    skills_extracted: list[str]
+
+
+class JobSkillsResponse(JobSkillsCreate):
+    class Config:
+        from_attributes = True
