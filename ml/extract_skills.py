@@ -45,3 +45,9 @@ def extract_skills_in_batches(df, column_name, batch_size=5):
         time.sleep(0.1)
 
     return all_results
+
+
+# df = "ml/data/jobs_data.csv"
+# column_name = "Job Description"
+# batch_size = 5
+# extract_skills_in_batches(df, column_name, batch_size)
